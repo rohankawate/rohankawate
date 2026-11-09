@@ -7,7 +7,8 @@ Live demo: https://rohankawate.github.io/walk-assist-/     ...
 
 Prototype only. This project has not been tested with visually impaired users. It is meant to add to a white cane or a guide, never to replace one. Distances and wall or stair detection are estimates.
 
-<!-- Add 2 or 3 screenshots here, for example: ![Dashboard](screenshots/dashboard.png) -->
+<img width="702" height="1600" alt="demo2" src="https://github.com/user-attachments/assets/e040ec1e-4e2b-494d-ac6c-fd27df310a89" />
+
 Why I built it
 
 A cane finds things at ground level, but it does not say what an object is, which way it is moving, or warn about things at head height. Many assistive tools need extra hardware or only speak English. Walk Assist uses a phone people already own, runs with no account, and speaks in local languages.
