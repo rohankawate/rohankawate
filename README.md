@@ -8,6 +8,10 @@ Live demo: https://rohankawate.github.io/walk-assist-/     ...
 Prototype only. This project has not been tested with visually impaired users. It is meant to add to a white cane or a guide, never to replace one. Distances and wall or stair detection are estimates.
 
 <img width="702" height="1600" alt="demo2" src="https://github.com/user-attachments/assets/e040ec1e-4e2b-494d-ac6c-fd27df310a89" />
+<img width="817" height="1600" alt="demo1" src="https://github.com/user-attachments/assets/2745ee54-4552-4b76-91ce-ce461f13cfc5" />
+<img width="702" height="1600" alt="demo" src="https://github.com/user-attachments/assets/411e9fea-5928-47d2-a0d2-4d906a94faaf" />
+
+
 
 Why I built it
 
