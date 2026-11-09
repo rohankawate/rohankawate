@@ -2,7 +2,7 @@ Walk Assist
 
 A voice-first walking assistant that runs in a phone browser. It uses the camera to warn about people, objects, walls and stairs, and it speaks and vibrates in English, Hindi or Kannada.
 
-Live demo: https://rohankawate.github.io/walk-assist-/     ...
+Live demo:  https://rohankawate.github.io/rohankawate/    ...
 (Open it on a phone, tap Start walking and allow the camera. No camera? Tap Try demo.)
 
 Prototype only. This project has not been tested with visually impaired users. It is meant to add to a white cane or a guide, never to replace one. Distances and wall or stair detection are estimates.
@@ -66,7 +66,7 @@ Open the local address on your computer, or deploy it (below) to test on a phone
 Deploy for free (GitHub Pages)
 Upload all files in this repo to a public GitHub repository.
 Go to Settings > Pages, choose Deploy from a branch, branch main, folder / (root).
-Open https:https://rohankawate.github.io/walk-assist-/ on your phone.
+Open https: https://rohankawate.github.io/rohankawate/ on your phone.
 Using it
 Hang the phone on a lanyard or chest pocket, camera facing forward, and use one earphone so you can still hear traffic.
 Tap Start walking, or say "start" once voice commands are on.
