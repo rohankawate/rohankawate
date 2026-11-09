@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="theme-color" content="#080c0b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Walk Assist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;700;800&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================
+   Walk Assist: style.css (v5, landing page + dashboard)
+   Edit the colours in :root to re-theme the whole page.
+   ========================================================== */
+:root {
+  --bg:#080c0b; --panel:#0e1413; --panel2:#131b19; --line:rgba(255,255,255,.09);
+  --text:#f2f6f4; --muted:#8fa39a; --sage:#a9cdb9;
+  --clear:#3fd99a; --warn:#ffc400; --danger:#ff5a5f; --focus:#6fd3ff;
+  --radius:20px;
+  --font:"Manrope","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,Menlo,monospace;
+}
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; scroll-padding-top:70px; }
+body { margin:0; color:var(--text); font-family:var(--font); background:var(--bg);
+  background-image:radial-gradient(60% 40% at 80% 8%, rgba(169,205,185,.12), transparent 70%),
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size:auto, 36px 36px, 36px 36px; padding-bottom:env(safe-area-inset-bottom); }
+.wrap { width:min(1120px, 100% - 32px); margin:0 auto; }
+h2 { margin:0; }
+
+/* ---------- Nav ---------- */
+.nav { position:sticky; top:0; z-index:20; backdrop-filter:blur(14px); background:rgba(8,12,11,.8);
+       border-bottom:1px solid var(--line); padding-top:env(safe-area-inset-top); }
+.nav .wrap { display:flex; align-items:center; gap:22px; height:62px; }
+.brand { display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:-.3px; }
+.logo { width:30px; height:30px; border-radius:9px; background:linear-gradient(145deg,var(--sage),#5f8f76); display:grid; place-items:center; }
+.logo::after { content:""; width:12px; height:12px; border-radius:50%; border:3px solid var(--bg); }
+.links { display:none; gap:24px; margin:0 auto; color:var(--muted); font-size:.85rem; font-weight:600; }
+.links a { color:inherit; text-decoration:none; } .links a:hover { color:var(--text); }
+.sys { margin-left:auto; display:flex; align-items:center; gap:7px; padding:7px 12px; border-radius:999px; border:1px solid var(--line);
+       background:rgba(255,255,255,.04); font:700 .68rem var(--mono); letter-spacing:1px; text-transform:uppercase; color:var(--muted); }
+.sys i { width:8px; height:8px; border-radius:50%; background:#5d7288; }
+.sys.on { color:var(--clear); border-color:rgba(63,217,154,.4); } .sys.on i { background:var(--clear); box-shadow:0 0 10px var(--clear); }
+
+/* ---------- Hero ---------- */
+.hero { display:grid; gap:36px; padding:34px 0 20px; }
+.badge { display:inline-flex; align-items:center; gap:8px; padding:7px 14px; border-radius:999px; border:1px solid var(--line);
+         background:rgba(255,255,255,.04); font:700 .66rem var(--mono); letter-spacing:1.5px; color:var(--muted); }
+.badge::before { content:""; width:6px; height:6px; border-radius:50%; background:var(--sage); }
+h1 { margin:18px 0 0; font-size:clamp(2.3rem, 8vw, 3.8rem); font-weight:800; line-height:1.04; letter-spacing:-1.5px; }
+h1 em { font-style:normal; color:var(--sage); }
+.lead { margin:18px 0 0; max-width:520px; color:var(--muted); line-height:1.65; font-size:1.02rem; }
+.cta { display:flex; flex-wrap:wrap; gap:12px; margin-top:26px; }
+#startBtn { display:flex; align-items:center; gap:10px; padding:15px 24px; font:inherit; font-size:1rem; font-weight:800; color:#0a0f0d;
+            background:#eef3f0; border:none; border-radius:12px; cursor:pointer; touch-action:manipulation; }
+#startBtn::before { content:"\25B6"; font-size:.8rem; }
+#startBtn:disabled { background:rgba(255,255,255,.08); color:var(--muted); cursor:default; }
+#startBtn:disabled::before { content:""; width:9px; height:9px; border-radius:50%; background:var(--clear); box-shadow:0 0 10px var(--clear); }
+.ghost { padding:15px 22px; border-radius:12px; border:1px solid var(--line); color:var(--text); text-decoration:none; font-weight:700; font-size:1rem; background:rgba(255,255,255,.03); }
+#startBtn:focus-visible, .ghost:focus-visible, .dock button:focus-visible { outline:3px solid var(--focus); outline-offset:3px; }
+.tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:24px; }
+.tags span { padding:6px 11px; border-radius:8px; border:1px solid var(--line); font:600 .7rem var(--mono); color:var(--muted); }
+
+/* ---------- Phone mockup ---------- */
+.stage { position:relative; display:flex; justify-content:center; }
+.phone { width:min(340px, 100%); padding:12px; border-radius:42px; background:#050807; border:1px solid rgba(255,255,255,.14);
+         box-shadow:0 40px 80px -30px #000, 0 0 0 6px rgba(255,255,255,.03), 0 0 90px -30px rgba(169,205,185,.35); }
+.phone::before { content:""; display:block; width:84px; height:22px; margin:0 auto 10px; border-radius:0 0 14px 14px; background:#000; }
+#wrap { position:relative; width:100%; aspect-ratio:3/4; overflow:hidden; border-radius:26px; background:#020504; }
+video, canvas#canvas { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+#placeholder { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:20px; text-align:center; }
+#placeholder svg { width:52px; height:52px; margin-bottom:8px; stroke:var(--sage); } #placeholder p { margin:0; font-weight:700; } #placeholder small { color:var(--muted); }
+#wrap.live #placeholder { display:none; }
+.hud { position:absolute; z-index:4; top:12px; left:12px; right:12px; display:flex; justify-content:space-between; }
+#wrap:not(.live) .hud { display:none; }
+.hud span { display:flex; align-items:center; gap:6px; padding:4px 9px; border-radius:999px; background:rgba(0,0,0,.65); backdrop-filter:blur(6px); font:700 .64rem var(--mono); letter-spacing:1px; }
+.hud .live i { width:7px; height:7px; border-radius:50%; background:var(--danger); animation:blink 1.2s infinite; }
+@keyframes blink { 50% { opacity:.25; } }
+.zones { position:absolute; inset:0; z-index:2; display:grid; grid-template-columns:repeat(3,1fr); pointer-events:none; }
+.zones span { display:flex; align-items:flex-end; justify-content:center; padding-bottom:12px; font:700 .6rem var(--mono); letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.65); text-shadow:0 1px 4px #000; transition:background-color .15s; }
+.zones span + span { border-left:1px dashed rgba(255,255,255,.2); }
+.zones span.warn { background:linear-gradient(0deg,rgba(255,196,0,.4),rgba(255,196,0,.03)); color:#fff; }
+.zones span.danger { background:linear-gradient(0deg,rgba(255,90,95,.55),rgba(255,90,95,.05)); color:#fff; }
+#status { margin-top:10px; padding:14px 14px 14px 16px; min-height:78px; display:flex; align-items:center; text-align:left; border-radius:16px;
+          background:var(--panel2); border:1px solid var(--line); border-left:4px solid var(--clear); font-size:1rem; font-weight:700; line-height:1.35; transition:border-color .2s, background .2s; }
+#status.warn { border-left-color:var(--warn); } #status.danger { border-left-color:var(--danger); background:#241416; }
+.dock { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:10px; }
+.dock button { height:54px; border-radius:14px; border:1px solid var(--line); background:var(--panel2); color:var(--muted); cursor:pointer; display:grid; place-items:center; font:800 .8rem var(--mono); }
+.dock button.on { background:#eef3f0; color:#0a0f0d; }
+.dock svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.fchip { display:none; position:absolute; z-index:5; padding:8px 12px; border-radius:999px; background:rgba(10,15,13,.9); border:1px solid var(--line); font:700 .7rem var(--mono); box-shadow:0 10px 30px -10px #000; }
+
+/* ---------- Sections ---------- */
+.section { padding:46px 0 6px; }
+.eyebrow { font:700 .68rem var(--mono); letter-spacing:3px; color:var(--sage); text-transform:uppercase; }
+.section h2 { margin-top:10px; font-size:clamp(1.6rem,4vw,2.2rem); letter-spacing:-.8px; }
+.features { display:grid; gap:12px; margin-top:24px; }
+.feat { padding:18px; border-radius:var(--radius); background:var(--panel); border:1px solid var(--line); }
+.feat svg { width:26px; height:26px; fill:none; stroke:var(--sage); stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+.feat b { display:block; margin:12px 0 4px; } .feat span { color:var(--muted); font-size:.88rem; line-height:1.5; }
+
+.panel { margin-top:24px; border-radius:var(--radius); background:var(--panel); border:1px solid var(--line); overflow:hidden; }
+.stats { display:grid; grid-template-columns:repeat(2,1fr); border-bottom:1px solid var(--line); }
+.stat { padding:14px 16px; border-right:1px solid var(--line); } .stat:nth-child(2n) { border-right:0; }
+.stat small { display:block; font:700 .6rem var(--mono); letter-spacing:1.4px; text-transform:uppercase; color:var(--muted); }
+.stat b { display:block; margin-top:6px; font:800 1.1rem var(--mono); }
+.stat.clear b { color:var(--clear); } .stat.warn b { color:var(--warn); } .stat.danger b { color:var(--danger); }
+.cells { display:grid; }
+.cell { padding:18px; border-top:1px solid var(--line); }
+.cell:first-child { border-top:0; }
+.cell h3 { margin:0 0 14px; font:700 .66rem var(--mono); letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
+.gauge { --p:8; --c:var(--clear); position:relative; width:150px; aspect-ratio:1; margin:0 auto; border-radius:50%; display:grid; place-items:center;
+         background:conic-gradient(var(--c) calc(var(--p) * 1%), rgba(255,255,255,.08) 0); }
+.gauge::before { content:""; position:absolute; inset:13px; border-radius:50%; background:var(--panel); }
+.gauge b { position:relative; font-size:1.9rem; font-weight:800; }
+#gaugeLbl { margin-top:12px; text-align:center; font:700 .7rem var(--mono); letter-spacing:2px; color:var(--muted); }
+#log { list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+#log:empty::before { content:"No events yet"; color:var(--muted); font-size:.88rem; }
+#log li { display:grid; grid-template-columns:10px 1fr auto; gap:10px; align-items:center; font-size:.88rem; font-weight:600; }
+#log li::before { content:""; width:9px; height:9px; border-radius:50%; background:var(--clear); }
+#log li.warn::before { background:var(--warn); } #log li.danger::before { background:var(--danger); }
+#log li span { order:2; } #log time { order:3; font:600 .68rem var(--mono); color:var(--muted); }
+.radar { width:100%; max-width:300px; display:block; margin:0 auto; overflow:visible; }
+.radar .sector { fill:rgba(255,255,255,.05); stroke:rgba(255,255,255,.12); transition:fill .15s; }
+.radar .sector.warn { fill:rgba(255,196,0,.55); } .radar .sector.danger { fill:rgba(255,90,95,.75); }
+.radar .ring { fill:none; stroke:rgba(255,255,255,.16); stroke-dasharray:2 4; }
+.radar .sweep { stroke:var(--sage); stroke-width:2; stroke-linecap:round; opacity:.8; transform-box:view-box; transform-origin:100px 100px; animation:sweep 3s ease-in-out infinite alternate; }
+.radar .me { fill:var(--sage); } .radar text { fill:var(--muted); font:700 8px var(--mono); letter-spacing:1px; text-anchor:middle; }
+@keyframes sweep { from { transform:rotate(-80deg); } to { transform:rotate(80deg); } }
+.sysl { display:grid; gap:11px; font-size:.9rem; font-weight:600; }
+.sysl div { display:flex; align-items:center; gap:10px; } .sysl div::before { content:"\2713"; color:var(--clear); font-weight:800; }
+.sysl div:has(.off)::before { content:"\2013"; color:var(--muted); } .sysl div:has(.warn)::before { content:"\2022"; color:var(--warn); }
+.sysl span { margin-left:auto; font:600 .72rem var(--mono); color:var(--muted); }
+.sysl .ok { color:var(--clear); }
+
+.settings { margin-top:24px; padding:6px 18px 16px; border-radius:var(--radius); background:var(--panel); border:1px solid var(--line); }
+.settings label { display:flex; align-items:center; gap:12px; padding:14px 0; font-weight:700; border-bottom:1px solid var(--line); }
+.settings select { margin-left:auto; padding:8px 10px; font:inherit; font-weight:700; color:var(--text); background:var(--bg); border:1px solid var(--line); border-radius:10px; }
+.settings input[type=checkbox] { width:22px; height:22px; accent-color:var(--sage); } .settings input[type=range] { margin-left:auto; width:45%; accent-color:var(--sage); }
+.settings .info { margin:10px 0 0; color:var(--muted); font:600 .74rem var(--mono); line-height:1.5; word-break:break-word; }
+.footer { display:grid; gap:14px; margin:34px 0 0; padding:18px; border-radius:var(--radius); border:1px solid var(--line); background:var(--panel); }
+.footer b { display:block; font:700 .62rem var(--mono); letter-spacing:2px; color:var(--sage); text-transform:uppercase; } .footer span { font-size:.9rem; font-weight:600; }
+.note { margin:18px 0 40px; color:var(--muted); font-size:.82rem; line-height:1.5; text-align:center; }
+@media (prefers-reduced-motion:reduce) { * { transition:none !important; animation:none !important; } }
+
+/* ---------- Wider screens ---------- */
+@media (min-width:700px) { .features { grid-template-columns:repeat(3,1fr); } .stats { grid-template-columns:repeat(4,1fr); } .stat:nth-child(2n) { border-right:1px solid var(--line); } .stat:last-child { border-right:0; }
+  .footer { grid-template-columns:repeat(4,1fr); } }
+@media (min-width:900px) {
+  .links { display:flex; } .hero { grid-template-columns:1.1fr .9fr; align-items:center; padding-top:64px; gap:50px; }
+  .fchip { display:block; } .cells { grid-template-columns:1fr 1.3fr 1.1fr 1fr; } .cell { border-top:0; border-left:1px solid var(--line); } .cell:first-child { border-left:0; }
+}
+
+</style>
+</head>
+<body>
+
+<header class="nav"><div class="wrap">
+  <div class="brand"><span class="logo"></span>Walk Assist</div>
+  <nav class="links"><a href="#features">Features</a><a href="#dashboard">Dashboard</a><a href="#settings">Settings</a></nav>
+  <button class="ghost sm" id="installBtn" hidden>Install app</button>
+  <div class="sys" id="sys"><i></i><span>Standby</span></div>
+</div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <span class="badge">STUDENT PROJECT · AIML · 2026</span>
+      <h1>Navigate safely<br>with <em>confidence</em></h1>
+      <p class="lead">Walk Assist is a voice-first walking assistant. It combines on-device computer vision and depth AI to warn about people, objects and walls, in English, Hindi and Kannada.</p>
+      <div class="cta"><button id="startBtn">Start walking</button><button class="ghost" id="demoBtn">Try demo (no camera)</button><a class="ghost" href="#features">View features</a></div>
+      <div class="tags"><span>COCO-SSD</span><span>Depth Anything</span><span>Web Speech</span><span>100% in-browser</span></div>
+    </div>
+    <div class="stage">
+      <span class="fchip" style="top:7%;right:-10%">COCO-SSD · objects</span>
+      <span class="fchip" style="top:46%;left:-14%">Depth AI · walls</span>
+      <span class="fchip" style="bottom:9%;right:-12%">Voice · 3 languages</span>
+      <div class="phone">
+        <div id="wrap">
+          <div id="placeholder"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L17 6h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.6"/></svg><p>Camera is off</p><small>Tap Start walking</small></div>
+          <video id="video" autoplay playsinline muted></video>
+          <canvas id="canvas"></canvas>
+          <div class="zones" aria-hidden="true"><span data-zone="left">Left</span><span data-zone="center">Ahead</span><span data-zone="right">Right</span></div>
+          <div class="hud" aria-hidden="true"><span class="live"><i></i>LIVE</span><span id="fps">-- det/s</span></div>
+        </div>
+        <div id="status" role="status" aria-live="polite">Press Start walking</div>
+        <div class="dock">
+          <button id="dockMic" class="on" aria-label="Toggle voice commands"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+          <button id="dockRepeat" aria-label="Repeat last alert"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/></svg></button>
+          <button id="dockSos" class="sos" aria-label="SOS: send my location">SOS</button>
+          <button id="dockLang" aria-label="Change language"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="eyebrow">What it does</div><h2>Built to guide, not to distract</h2>
+    <div class="features"><div class="feat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L17 6h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></svg><b>Computer vision</b><span>COCO-SSD finds people, vehicles and furniture, with distance and approach tracking.</span></div><div class="feat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg><b>Depth AI</b><span>Depth Anything spots walls and unknown obstacles that object detection misses.</span></div><div class="feat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg><b>Audio guidance</b><span>Short spoken alerts such as "Chair ahead. Move slightly left."</span></div><div class="feat"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="3" width="8" height="18" rx="2"/><path d="M4 8v8M20 8v8"/></svg><b>Haptic alerts</b><span>A gentle tap, fast pulses or one long buzz, depending on how close and how risky.</span></div><div class="feat"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><b>Voice commands</b><span>Say start, stop or repeat. No need to touch the screen.</span></div><div class="feat"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><b>Three languages</b><span>English, हिन्दी and ಕನ್ನಡ, for alerts and commands.</span></div><div class="feat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h4v-4h4v-4h4V8h4V4"/></svg><b>Stairs and drop-offs</b><span>The depth map flags sudden steps in the floor ahead, with an early "Stop".</span></div><div class="feat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg><b>Low-light warning</b><span>Tells you when the picture is too dark for detection to be reliable.</span></div><div class="feat"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg><b>SOS and test log</b><span>Send your location by WhatsApp, and export every alert as a CSV file.</span></div></div>
+  </section>
+
+  <section class="section" id="dashboard">
+    <div class="eyebrow">Live monitoring</div><h2>Dashboard</h2>
+    <div class="panel">
+      <div class="stats">
+        <div class="stat"><small>Objects</small><b id="statObjects">0</b></div>
+        <div class="stat"><small>Nearest</small><b id="statNearest">--</b></div>
+        <div class="stat"><small>Distance</small><b id="statDist">--</b></div>
+        <div class="stat" id="statBox"><small>Level</small><b id="statLevel">--</b></div>
+      </div>
+      <div class="cells">
+        <div class="cell"><h3>Risk level</h3><div class="gauge" id="gauge"><b id="gaugeNum">8%</b></div><div id="gaugeLbl">LOW RISK</div></div>
+        <div class="cell"><h3>Recent events</h3><ul id="log"></ul></div>
+        <div class="cell"><h3>Surroundings</h3><svg class="radar" viewBox="0 0 200 112" role="img" aria-label="Proximity radar">
+            <path class="sector" data-radar="left"   d="M100,100 L10,100 A90,90 0 0 1 55,22.06 Z"/>
+            <path class="sector" data-radar="center" d="M100,100 L55,22.06 A90,90 0 0 1 145,22.06 Z"/>
+            <path class="sector" data-radar="right"  d="M100,100 L145,22.06 A90,90 0 0 1 190,100 Z"/>
+            <path class="ring" d="M40,100 A60,60 0 0 1 160,100"/>
+            <path class="ring" d="M70,100 A30,30 0 0 1 130,100"/>
+            <line class="sweep" x1="100" y1="100" x2="100" y2="12"/>
+            <circle class="me" cx="100" cy="100" r="4"/>
+            <text x="32" y="110">LEFT</text><text x="100" y="110">AHEAD</text><text x="168" y="110">RIGHT</text>
+          </svg></div>
+        <div class="cell"><h3>System status</h3><div class="sysl">
+          <div>Camera<span id="stCam" class="off">Off</span></div><div>Object AI<span id="stObj" class="off">Off</span></div>
+          <div>Depth AI<span id="stDepth" class="off">Off</span></div><div>Voice<span id="stVoice" class="off">Off</span></div>
+          <div>Vibration<span id="stVibe" class="off">Off</span></div><div>Light<span id="stLight" class="off">--</span></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section"><div class="eyebrow">Controls</div><h2>Settings</h2><div class="settings" id="settings">
+        
+        <label>Language
+          <select id="lang"><option value="en">English</option><option value="hi">हिन्दी</option><option value="kn">ಕನ್ನಡ</option></select>
+        </label>
+        <label><input type="checkbox" id="optVoice" checked> Voice commands</label>
+        <label><input type="checkbox" id="optDepth" checked> Wall detection (depth AI)</label>
+        <label><input type="checkbox" id="optVibe" checked> Vibration</label>
+        <label>Emergency contact <input type="tel" id="sosNum" placeholder="+91 98765 43210" inputmode="tel"></label>
+        <label>Speech speed <input type="range" id="speechRate" min="0.7" max="1.5" step="0.1" value="1"></label>
+        <label>Volume <input type="range" id="speechVol" min="0.3" max="1" step="0.1" value="1"></label>
+        <label>Wall sensitivity <input type="range" id="depthSens" min="1" max="9" value="5"></label>
+        <div class="setrow"><button type="button" class="ghost sm" id="csvBtn">Download test log (CSV)</button></div>
+        <p class="info">SOS opens WhatsApp with your location. Save the number with country code. Settings are remembered on this phone. Install: Chrome menu > Install app (iPhone: Share > Add to Home Screen).</p>
+        <p class="info" id="info">Say: start, stop, repeat, hindi, kannada, english</p>
+        <p class="info" id="depthInfo">Depth AI: off</p>
+        <p class="info" id="langInfo"></p>
+      </div></section>
+
+  <div class="footer">
+    <div><b>Program</b><span>AIML student project</span></div><div><b>Year</b><span>2026</span></div>
+    <div><b>Platform</b><span>Web, on-device AI</span></div><div><b>Status</b><span>Prototype in testing</span></div>
+  </div>
+  <p class="note">Prototype only. Always use a cane or guide when walking.</p>
+</main>
+
+<!-- TensorFlow.js + COCO-SSD model -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3"></script>
+
+<script type="module">
+// FEATURE 7: depth AI (Depth Anything V2 small, ~25 MB, runs in the browser)
+try {
+  const { pipeline, env } = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.2');
+  try { env.backends.onnx.wasm.proxy = true; } catch (e) {}   // run in a worker thread
+  window.makeDepth = () => pipeline('depth-estimation', 'onnx-community/depth-anything-v2-small', { dtype: 'q8' });
+} catch (e) { window.depthLoadError = e.message; }
+</script>
+
+<script>
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const statusEl = document.getElementById('status');
+const startBtn = document.getElementById('startBtn');
+const zoneEls = {
+  left:   document.querySelector('[data-zone="left"]'),
+  center: document.querySelector('[data-zone="center"]'),
+  right:  document.querySelector('[data-zone="right"]')
+};
+
+const sysEl = document.getElementById('sys');
+const fpsEl = document.getElementById('fps');
+const statObjects = document.getElementById('statObjects');
+const statNearest = document.getElementById('statNearest');
+const statLevel = document.getElementById('statLevel');
+const statDist = document.getElementById('statDist');
+const statBox = document.getElementById('statBox');
+const logEl = document.getElementById('log');
+const radarEls = {
+  left:   document.querySelector('[data-radar="left"]'),
+  center: document.querySelector('[data-radar="center"]'),
+  right:  document.querySelector('[data-radar="right"]')
+};
+let lastFrame = performance.now();
+
+const optVoice = document.getElementById('optVoice');
+const optDepth = document.getElementById('optDepth');
+const optVibe = document.getElementById('optVibe');
+const langSel = document.getElementById('lang');
+const infoEl = document.getElementById('info');
+const depthInfo = document.getElementById('depthInfo');
+const langInfo = document.getElementById('langInfo');
+const rateEl = document.getElementById('speechRate'), volEl = document.getElementById('speechVol');
+const eventLog = [];
+let dark = false, lastLightCheck = 0, depthFall = false, fallHits = 0;
+let demoOn = false, running = false, paused = false, lastLevel = 'clear', lastSpeechEnd = 0;
+
+let model = null;
+let lastMessage = '';
+let lastSpokenTime = 0;
+const COOLDOWN = 3000; // ms before repeating the same message
+
+// ---------- FEATURE 2: danger list ----------
+// Moving / high-risk objects get an earlier and stronger warning.
+const DANGER = new Set(['car', 'bus', 'truck', 'motorcycle', 'bicycle', 'train']);
+
+const SURE = 0.65;   // below this confidence, say "obstacle" instead of the label
+
+// Box size (fraction of the frame) where an object counts as "mid" or "near".
+// Danger objects use smaller numbers, so they trigger from further away.
+const THRESHOLDS = {
+  normal: { near: 0.40, mid: 0.15 },
+  danger: { near: 0.25, mid: 0.08 }
+};
+
+// ---------- FEATURE 9: languages ----------
+const LANG_CODE = { en: 'en-IN', hi: 'hi-IN', kn: 'kn-IN' };
+let L = 'en';
+const EN_OBJ = { wall: 'wall or obstacle', drop: 'stairs or drop-off' };
+const HI_OBJ = { person:'व्यक्ति', chair:'कुर्सी', car:'कार', bus:'बस', truck:'ट्रक', motorcycle:'मोटरसाइकिल',
+  bicycle:'साइकिल', dog:'कुत्ता', cat:'बिल्ली', bed:'बिस्तर', couch:'सोफ़ा', 'dining table':'मेज़', tv:'टीवी',
+  refrigerator:'फ्रिज', bench:'बेंच', 'potted plant':'पौधा', train:'ट्रेन', obstacle:'रुकावट', wall:'दीवार या रुकावट', drop:'सीढ़ी या गड्ढा' };
+const KN_OBJ = { person:'ವ್ಯಕ್ತಿ', chair:'ಕುರ್ಚಿ', car:'ಕಾರು', bus:'ಬಸ್ಸು', truck:'ಟ್ರಕ್', motorcycle:'ಬೈಕ್',
+  bicycle:'ಸೈಕಲ್', dog:'ನಾಯಿ', cat:'ಬೆಕ್ಕು', bed:'ಹಾಸಿಗೆ', couch:'ಸೋಫಾ', 'dining table':'ಮೇಜು', tv:'ಟಿವಿ',
+  refrigerator:'ಫ್ರಿಜ್', bench:'ಬೆಂಚು', 'potted plant':'ಗಿಡ', train:'ರೈಲು', obstacle:'ಅಡಚಣೆ', wall:'ಗೋಡೆ ಅಥವಾ ಅಡಚಣೆ', drop:'ಮೆಟ್ಟಿಲು ಅಥವಾ ಕುಸಿತ' };
+const rnd = d => (d < 5 ? Math.round(d * 2) / 2 : Math.round(d));
+const T = {
+  en: { clear:'Path is clear', stop:'Stop.', careful:'Careful.', wait:'Wait.',
+    go:{ left:'Move slightly left.', right:'Move slightly right.' },
+    place:{ center:'ahead', left:'on your left', right:'on your right' },
+    count:(n, o) => plural(EN_OBJ[o] || o, n),
+    dist:d => d < 1 ? 'under 1 meter' : `${rnd(d)} meter${rnd(d) === 1 ? '' : 's'}`,
+    phrase:(o, a, p, d) => `${o}${a ? ' approaching' : ''} ${p}${d ? ', about ' + d : ''}`,
+    starting:'Starting. Please wait', ready:'Ready. Start walking', paused:'Paused', resumed:'Resumed',
+    demo:'Demo mode. No camera needed', dark:'Too dark. Detection may be unreliable', sosAsk:'SOS. Tap again to send your location', sosGo:'Opening WhatsApp with your location' },
+  hi: { clear:'रास्ता साफ़ है', stop:'रुकिए।', careful:'सावधान।', wait:'इंतज़ार कीजिए।',
+    go:{ left:'थोड़ा बाईं ओर हटिए।', right:'थोड़ा दाईं ओर हटिए।' },
+    place:{ center:'सामने', left:'आपके बाईं ओर', right:'आपके दाईं ओर' },
+    count:(n, o) => { const x = HI_OBJ[o] || o; return n > 1 ? `${n} ${x}` : x; },
+    dist:d => d < 1 ? 'एक मीटर से कम' : `${rnd(d)} मीटर`,
+    phrase:(o, a, p, d) => `${p} ${o}${a ? ' पास आ रहा है' : ''}${d ? ', लगभग ' + d : ''}`,
+    starting:'शुरू हो रहा है, कृपया प्रतीक्षा करें', ready:'तैयार। चलना शुरू करें', paused:'रुका हुआ', resumed:'फिर शुरू',
+    demo:'डेमो मोड। कैमरे की ज़रूरत नहीं', dark:'बहुत अंधेरा है। पहचान सही नहीं हो सकती', sosAsk:'एसओएस। लोकेशन भेजने के लिए फिर दबाएँ', sosGo:'आपकी लोकेशन के साथ व्हाट्सऐप खुल रहा है' },
+  kn: { clear:'ದಾರಿ ಖಾಲಿ ಇದೆ', stop:'ನಿಲ್ಲಿ.', careful:'ಎಚ್ಚರಿಕೆ.', wait:'ನಿರೀಕ್ಷಿಸಿ.',
+    go:{ left:'ಸ್ವಲ್ಪ ಎಡಕ್ಕೆ ಸರಿಯಿರಿ.', right:'ಸ್ವಲ್ಪ ಬಲಕ್ಕೆ ಸರಿಯಿರಿ.' },
+    place:{ center:'ಮುಂದೆ', left:'ನಿಮ್ಮ ಎಡಕ್ಕೆ', right:'ನಿಮ್ಮ ಬಲಕ್ಕೆ' },
+    count:(n, o) => { const x = KN_OBJ[o] || o; return n > 1 ? `${n} ${x}` : x; },
+    dist:d => d < 1 ? 'ಒಂದು ಮೀಟರ್‌ಗಿಂತ ಕಡಿಮೆ' : `${rnd(d)} ಮೀಟರ್`,
+    phrase:(o, a, p, d) => `${p} ${o}${a ? ' ಹತ್ತಿರ ಬರುತ್ತಿದೆ' : ''}${d ? ', ಸುಮಾರು ' + d : ''}`,
+    starting:'ಪ್ರಾರಂಭವಾಗುತ್ತಿದೆ, ದಯವಿಟ್ಟು ಕಾಯಿರಿ', ready:'ಸಿದ್ಧ. ನಡೆಯಲು ಪ್ರಾರಂಭಿಸಿ', paused:'ನಿಲ್ಲಿಸಲಾಗಿದೆ', resumed:'ಮತ್ತೆ ಪ್ರಾರಂಭ',
+    demo:'ಡೆಮೊ ಮೋಡ್. ಕ್ಯಾಮೆರಾ ಅಗತ್ಯವಿಲ್ಲ', dark:'ತುಂಬಾ ಕತ್ತಲೆ. ಪತ್ತೆ ಸರಿಯಾಗಿರದಿರಬಹುದು', sosAsk:'ಎಸ್‌ಒಎಸ್. ಸ್ಥಳ ಕಳುಹಿಸಲು ಮತ್ತೆ ಒತ್ತಿ', sosGo:'ನಿಮ್ಮ ಸ್ಥಳದೊಂದಿಗೆ ವಾಟ್ಸಾಪ್ ತೆರೆಯುತ್ತಿದೆ' }
+};
+const t = () => T[L];
+
+function pickVoice() {
+  const vs = speechSynthesis.getVoices();
+  const code = LANG_CODE[L];
+  return vs.find(v => v.lang.replace('_', '-') === code) || vs.find(v => v.lang.toLowerCase().startsWith(L));
+}
+function checkVoice() {
+  langInfo.textContent = (L !== 'en' && !pickVoice())
+    ? 'No ' + (L === 'hi' ? 'Hindi' : 'Kannada') + ' voice found. Install it in phone Settings > Text-to-speech.' : '';
+}
+speechSynthesis.onvoiceschanged = checkVoice;
+
+// ---------- Speech ----------
+function speak(text, level, force) {
+  statusEl.textContent = text;
+  statusEl.className = level;                 // clear | warn | danger
+  if (paused && !force) return;
+
+  if (!force && speechSynthesis.speaking && level !== 'danger') return;   // let it finish
+  const now = Date.now();
+  if (!force && text === lastMessage && now - lastSpokenTime < COOLDOWN) return;
+  if (text !== lastMessage) addLog(text, level);
+  lastMessage = text;
+  lastLevel = level;
+  lastSpokenTime = now;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = LANG_CODE[L];
+  u.rate = parseFloat(rateEl.value) || 1;
+  u.volume = parseFloat(volEl.value) || 1;
+  const v = pickVoice();
+  if (v) u.voice = v;
+  u.onend = () => { lastSpeechEnd = Date.now(); };
+  speechSynthesis.speak(u);
+}
+
+// ---------- Alert log (last 4 messages) ----------
+function addLog(text, level) {
+  eventLog.push({ t: new Date().toISOString(), mode: demoOn ? 'demo' : 'live', lang: L, level, text });
+  const li = document.createElement('li');
+  li.className = level;
+  const t = document.createElement('time');
+  t.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const msg = document.createElement('span');
+  msg.textContent = text;
+  li.append(t, msg);
+  logEl.prepend(li);
+  while (logEl.children.length > 4) logEl.lastChild.remove();
+}
+
+// ---------- Camera ----------
+async function startCamera() {
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: { ideal: 'environment' } },   // back camera if available
+    audio: false
+  });
+  video.srcObject = stream;
+  await new Promise(r => video.onloadedmetadata = r);
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  document.getElementById('wrap').classList.add('live');
+}
+
+// ---------- Helpers ----------
+function getZone(centerX, W) {
+  if (centerX < W / 3) return 'left';
+  if (centerX > (2 * W) / 3) return 'right';
+  return 'center';
+}
+
+// Two clues for "how close": box SIZE, and how LOW the box bottom sits in the frame.
+// Things standing on the floor get lower in the picture as you get closer to them,
+// so a big object whose bottom edge is near the bottom of the frame is close.
+function classify(name, area, bottom) {
+  const isDanger = DANGER.has(name);
+  const t = isDanger ? THRESHOLDS.danger : THRESHOLDS.normal;
+  const minArea = isDanger ? 0.03 : 0.05;     // ignore tiny things for the "low in frame" rule
+  if (area >= t.near || (bottom > 0.93 && area >= minArea * 2)) return 'near';
+  if (area >= t.mid  || (bottom > 0.80 && area >= minArea))     return 'mid';
+  return null;                                // too far to mention
+}
+
+function plural(name, count) {
+  if (count === 1) return name;
+  if (name === 'person') return `${count} people`;
+  if (name === 'bus') return `${count} buses`;
+  return `${count} ${name}s`;
+}
+
+function placeText(zone) {
+  if (zone === 'center') return 'ahead';
+  return `on your ${zone}`;
+}
+
+// ---------- FEATURE 6: distance from known object height ----------
+// If we know how tall something really is, its height in pixels tells us how far it is.
+const KNOWN_HEIGHT = { person: 1.7, car: 1.5, bus: 3.2, truck: 3.0, motorcycle: 1.2,
+                       bicycle: 1.0, chair: 0.9, dog: 0.5 };       // metres
+
+function estimateDistance(name, bbox, W, H) {
+  const real = KNOWN_HEIGHT[name];
+  if (!real) return null;
+  const [x, y, w, h] = bbox;
+  if (y < 3 || y + h > H - 3) {                 // cut off by the frame edge
+    return name === 'person' ? 1.0 : null;      // a cut-off person is very close
+  }
+  const focal = 0.714 * Math.max(W, H);         // assumes ~70 degree field of view
+  return (real * focal) / h;                    // metres
+}
+
+function formatDistance(d) {
+  if (d < 1) return 'under 1 meter';
+  const r = d < 5 ? Math.round(d * 2) / 2 : Math.round(d);
+  return `${r} meter${r === 1 ? '' : 's'}`;
+}
+
+function distanceLevel(name, d) {
+  if (d == null) return null;
+  const danger = DANGER.has(name);
+  if (d < (danger ? 4 : 1.5)) return 'near';
+  if (d < (danger ? 10 : 3.5)) return 'mid';
+  return null;                                  // far enough
+}
+
+const RANK = { near: 2, mid: 1 };
+function strongest(a, b) { return (RANK[b] || 0) > (RANK[a] || 0) ? b : a; }
+
+// ---------- FEATURE 5: approaching detection ----------
+// Remember each object's box size over the last few frames. A box that keeps
+// growing means the object is getting closer.
+const APPROACH_RATIO = 1.3;                     // grew by 30% over ~3 frames
+let tracks = [];
+
+function updateTracks(dets, W, H) {
+  const next = [], flags = [], used = new Set();
+  dets.forEach(p => {
+    const [x, y, w, h] = p.bbox;
+    const cx = x + w / 2, cy = y + h / 2, area = (w * h) / (W * H);
+    let best = -1, bestD = 0.2;                 // same object moves < 20% of width per frame
+    tracks.forEach((t, j) => {
+      if (used.has(j) || t.cls !== p.class) return;
+      const d = Math.hypot(cx - t.cx, cy - t.cy) / W;
+      if (d < bestD) { bestD = d; best = j; }
+    });
+    let hist = [area];
+    if (best >= 0) { used.add(best); hist = [...tracks[best].hist, area].slice(-4); }
+    const n = hist.length;
+    flags.push(n >= 3 && hist[n - 1] > hist[0] * APPROACH_RATIO && hist[n - 1] >= hist[n - 2] * 0.97);
+    next.push({ cls: p.class, cx, cy, hist });
+  });
+  tracks = next;
+  return flags;
+}
+
+// ---------- Decision logic (features 1 to 6) ----------
+function analyze(predictions) {
+  const W = demoOn ? 480 : video.videoWidth;
+  const H = demoOn ? 640 : video.videoHeight;
+  const zones = { left: '', center: '', right: '' };   // '' | 'warn' | 'danger'
+  const items = [];
+
+  const good = predictions.filter(p => p.score >= 0.5);  // ignore weak detections
+  const approachFlags = updateTracks(good, W, H);
+
+  good.forEach((p, i) => {
+    const [x, y, w, h] = p.bbox;
+    const area = (w * h) / (W * H);
+    const dist = estimateDistance(p.class, p.bbox, W, H);
+    const approaching = approachFlags[i];
+
+    let level = strongest(classify(p.class, area, (y + h) / H), distanceLevel(p.class, dist));
+    if (!level && approaching && area >= 0.02) level = 'mid';
+    if (!level) return;
+
+    const zone = getZone(x + w / 2, W);
+    const isDanger = DANGER.has(p.class);
+    const spoken = p.score < SURE ? 'obstacle' : p.class;
+    items.push({ name: spoken, zone, level, isDanger, approaching, area, dist, cx: x + w / 2 });
+
+    // FEATURE 1: how strongly each zone should light up
+    if (level === 'near' || isDanger || approaching) zones[zone] = 'danger';
+    else if (zones[zone] !== 'danger') zones[zone] = 'warn';
+  });
+
+  // FEATURE 7: walls and other unknown obstacles from the depth map
+  if (depthOn()) {
+    for (const z of ['left', 'center', 'right']) {
+      const sc = depthZones[z];
+      const lvl = sc >= DEPTH_NEAR_AT() ? 'near' : (sc >= DEPTH_MID_AT() ? 'mid' : null);
+      if (!lvl || items.some(i => i.zone === z)) continue;     // COCO already reported this zone
+      items.push({ name: 'wall', zone: z, level: lvl, isDanger: false, approaching: false,
+                   area: sc * 0.5, dist: null, cx: z === 'left' ? W / 6 : z === 'right' ? 5 * W / 6 : W / 2 });
+      zones[z] = lvl === 'near' ? 'danger' : (zones[z] || 'warn');
+    }
+  }
+
+  if (depthOn() && depthFall && !items.some(i => i.zone === 'center' && i.level === 'near')) {
+    items.push({ name: 'drop', zone: 'center', level: 'near', isDanger: true, approaching: false, area: 0.6, dist: null, cx: W / 2 });
+    zones.center = 'danger';
+  }
+
+  if (items.length === 0) {
+    return { message: t().clear, level: 'clear', zones, nearest: '--', dist: null, vibe: 'none' };
+  }
+
+  // FEATURE 3: group same object + zone + motion ("2 people approaching ahead")
+  const groups = {};
+  for (const it of items) {
+    const key = it.name + '|' + it.zone + '|' + it.approaching;
+    if (!groups[key]) groups[key] = { name: it.name, zone: it.zone, approaching: it.approaching,
+                                      count: 0, area: 0, dist: null };
+    const g = groups[key];
+    g.count++;
+    g.area = Math.max(g.area, it.area);
+    if (it.dist != null) g.dist = g.dist == null ? it.dist : Math.min(g.dist, it.dist);
+  }
+  const top = Object.values(groups).sort((a, b) => b.area - a.area).slice(0, 3);
+  const phrases = top.map(g => t().phrase(t().count(g.count, g.name), g.approaching,
+    t().place[g.zone], g.dist != null ? t().dist(g.dist) : ''));
+
+  const centerItems = items.filter(i => i.zone === 'center');
+  const centerNear = centerItems.some(i => i.level === 'near');
+  const centerApproaching = centerItems.some(i => i.approaching);
+  const anyDanger = items.some(i => i.isDanger);
+  const anyApproaching = items.some(i => i.approaching);
+  const level = (centerNear || anyDanger || centerApproaching) ? 'danger' : 'warn';
+
+  let message = '';
+  if (centerNear) message += t().stop + ' ';
+  else if (anyDanger || anyApproaching) message += t().careful + ' ';
+  message += phrases.join('. ') + '. ';
+
+  // Suggest a direction if something is blocking the middle
+  if (centerItems.length > 0) {
+    const biggest = [...centerItems].sort((a, b) => b.area - a.area)[0];
+    const preferred = biggest.cx < W / 2 ? 'right' : 'left';   // go away from the object
+    const other = preferred === 'right' ? 'left' : 'right';
+    if (!zones[preferred]) message += t().go[preferred];
+    else if (!zones[other]) message += t().go[other];
+    else message += t().wait;
+  }
+
+  // FEATURE 4: how strongly the phone should vibrate
+  let vibe = 'far';                                            // gentle tap
+  if (centerNear) vibe = 'stop';                               // one long buzz
+  else if (level === 'danger' || items.some(i => i.approaching || i.level === 'near')) vibe = 'near'; // fast pulses
+
+  const nearest = items.reduce((a, b) => (b.area > a.area ? b : a));
+  return { message: message.trim(), level, zones, nearest: nearest.name,
+           dist: nearest.dist, vibe };
+}
+
+// ---------- Drawing ----------
+function drawBoxes(predictions) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (demoOn) {                                // simple dark backdrop instead of a camera picture
+    const g = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    g.addColorStop(0, '#0b1512'); g.addColorStop(0.55, '#101b17'); g.addColorStop(1, '#1c2a24');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+  ctx.lineWidth = 3;
+  ctx.font = '20px Arial';
+  for (const p of predictions) {
+    if (p.score < 0.5) continue;
+    const [x, y, w, h] = p.bbox;
+    const color = DANGER.has(p.class) ? '#ff5252' : '#ffc400';
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.strokeRect(x, y, w, h);
+    ctx.fillText(p.class + ' ' + Math.round(p.score * 100) + '%', x + 4, y + 22);
+  }
+}
+
+function lightZones(zones) {
+  for (const z in zoneEls) {
+    zoneEls[z].className = zones[z];
+    radarEls[z].setAttribute('class', 'sector ' + zones[z]);
+  }
+}
+
+// ---------- FEATURE 7: depth engine ----------
+// Depth Anything gives RELATIVE depth (bright = near). We average the middle band
+// of the picture in 3 columns; a wall right in front makes that band bright.
+// Score = how near the middle band is, compared with the nearest things in the picture
+// (usually the floor at your feet). 1.0 = as near as the nearest thing; 0.2 = far away.
+// The "Wall sensitivity" slider moves these two limits (higher = warns from further away).
+const sensEl = document.getElementById('depthSens');
+const DEPTH_NEAR_AT = () => 0.95 - 0.06 * sensEl.value;
+const DEPTH_MID_AT  = () => DEPTH_NEAR_AT() - 0.12;
+const DROP_AT = () => 0.42 - 0.025 * sensEl.value;     // how sudden a fall in the floor must be
+const RISE_AT = () => DROP_AT() * 0.65;
+let depthEst = null, depthLoading = false;
+let depthZones = { left: 0, center: 0, right: 0 };
+const dCanvas = document.createElement('canvas');
+dCanvas.width = 224; dCanvas.height = 224;
+const dCtx = dCanvas.getContext('2d');
+const depthOn = () => demoOn || (!!depthEst && optDepth.checked);
+
+async function initDepth() {
+  if (depthEst || depthLoading || !optDepth.checked) return;
+  if (!window.makeDepth) { depthInfo.textContent = 'Depth AI unavailable: ' + (window.depthLoadError || 'library not loaded'); return; }
+  depthLoading = true;
+  depthInfo.textContent = 'Depth AI: downloading model (about 25 MB)...';
+  try {
+    depthEst = await window.makeDepth();
+    depthInfo.textContent = 'Depth AI: on';
+    depthLoop();
+  } catch (e) { depthInfo.textContent = 'Depth AI failed: ' + e.message; }
+  depthLoading = false;
+}
+
+// data = raw depth values (bigger = nearer), w x h
+function scoreDepth(data, w, h) {
+  const sample = [];
+  for (let i = 0; i < data.length; i += 11) sample.push(data[i]);
+  sample.sort((a, b) => a - b);
+  const ref = sample[Math.floor(sample.length * 0.98)] || 1;     // nearest things in the picture
+  const sums = [0, 0, 0], cnt = [0, 0, 0];
+  for (let y = Math.floor(h * 0.2); y < Math.floor(h * 0.7); y += 2) {
+    for (let x = 0; x < w; x += 2) {
+      const c = Math.min(2, Math.floor((x / w) * 3));
+      sums[c] += data[y * w + x]; cnt[c]++;
+    }
+  }
+  // Floor profile straight ahead, from your feet up to the horizon. Normally it fades smoothly.
+  // A sudden big fall = drop-off or stairs going down; a sudden rise = a step or stairs going up.
+  const prof = [];
+  for (let k = 0; k < 12; k++) {
+    const y = Math.floor(h * (0.92 - k * 0.035));
+    let sm = 0, c = 0;
+    for (let x = Math.floor(w * 0.35); x < Math.floor(w * 0.65); x += 2) { sm += data[y * w + x]; c++; }
+    prof.push(sm / c / ref);
+  }
+  let drop = 0, rise = 0;
+  for (let k = 0; k < 11; k++) { drop = Math.max(drop, prof[k] - prof[k + 1]); rise = Math.max(rise, prof[k + 1] - prof[k]); }
+  return { left: sums[0] / cnt[0] / ref, center: sums[1] / cnt[1] / ref, right: sums[2] / cnt[2] / ref, step: { drop, rise } };
+}
+
+async function depthLoop() {
+  if (!depthOn() || paused) { setTimeout(depthLoop, 700); return; }
+  try {
+    dCtx.drawImage(video, 0, 0, 224, 224);
+    const out = await depthEst(dCanvas.toDataURL('image/jpeg', 0.7));
+    if (out.predicted_depth) {
+      const dims = out.predicted_depth.dims;
+      depthZones = scoreDepth(out.predicted_depth.data, dims[dims.length - 1], dims[dims.length - 2]);
+    } else {
+      depthZones = scoreDepth(out.depth.data, out.depth.width, out.depth.height);
+    }
+    const st = depthZones.step;
+    fallHits = (st.drop > DROP_AT() || st.rise > RISE_AT()) ? fallHits + 1 : 0;   // needs 2 readings in a row
+    depthFall = fallHits >= 2;
+    depthInfo.textContent = `Depth AI: on | step ${st.drop.toFixed(2)}/${st.rise.toFixed(2)} | near L ${depthZones.left.toFixed(2)} C ${depthZones.center.toFixed(2)} R ${depthZones.right.toFixed(2)} | warns at ${DEPTH_MID_AT().toFixed(2)} / ${DEPTH_NEAR_AT().toFixed(2)}`;
+  } catch (e) { depthInfo.textContent = 'Depth error: ' + e.message; }
+  setTimeout(depthLoop, 1500);
+}
+
+// ---------- FEATURE 8: voice commands ----------
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null;
+const WORDS = {
+  stop:   ['stop', 'pause', 'ruko', 'रुको', 'रुकिए', 'रुक', 'ನಿಲ್ಲಿಸು', 'ನಿಲ್ಲಿ'],
+  start:  ['start', 'resume', 'go', 'shuru', 'शुरू', 'चालू', 'ಶುರು', 'ಪ್ರಾರಂಭ'],
+  repeat: ['repeat', 'again', 'dohrao', 'दोहराओ', 'फिर से', 'ಮತ್ತೆ', 'ಪುನಃ'],
+  hi:     ['hindi', 'हिंदी', 'हिन्दी'],
+  kn:     ['kannada', 'ಕನ್ನಡ'],
+  en:     ['english', 'अंग्रेजी', 'ಇಂಗ್ಲಿಷ್']
+};
+
+function setLang(code) {
+  L = code; langSel.value = code; checkVoice(); saveSettings();
+  if (rec) try { rec.stop(); } catch (e) {}       // onend restarts it in the new language
+}
+
+let lastCmd = '', lastCmdTime = 0;
+function handleCommand(text) {
+  const said = text.toLowerCase().trim().replace(/[.,!?।]/g, '');
+  infoEl.textContent = 'Mic heard: "' + said + '"';
+  if (!said || said.split(/\s+/).length > 4) return null;
+  // ignore the app's own voice coming back through the microphone
+  if (Date.now() - lastSpokenTime < 2500 && lastMessage.toLowerCase().includes(said)) return null;
+  const has = k => WORDS[k].some(w => said.includes(w));
+  let cmd = null;
+  for (const k of ['hi', 'kn', 'en']) if (has(k)) { cmd = k; break; }
+  if (!cmd) cmd = has('repeat') ? 'repeat' : has('stop') ? 'stop' : has('start') ? 'start' : null;
+  if (!cmd) return null;
+  const now = Date.now();
+  if (cmd === lastCmd && now - lastCmdTime < 2500) return null;   // same word heard twice
+  lastCmd = cmd; lastCmdTime = now;
+  if (cmd === 'hi' || cmd === 'kn' || cmd === 'en') setLang(cmd);
+  else if (cmd === 'repeat') speak(lastMessage || t().ready, lastLevel, true);
+  else if (cmd === 'stop') { paused = true; buzz('none'); speak(t().paused, 'warn', true); }
+  else { paused = false; speak(t().resumed, 'clear', true); }
+  addLog('Voice: ' + said, 'warn');
+  return cmd;
+}
+
+function startVoice() {
+  if (!SR) { infoEl.textContent = 'Voice commands need Chrome (Android) or Safari.'; return; }
+  if (rec || !optVoice.checked) return;
+  rec = new SR();
+  rec.continuous = true;
+  rec.interimResults = true;                      // react as soon as the word is heard
+  rec.lang = LANG_CODE[L];
+  rec.onstart = () => { infoEl.textContent = 'Mic: listening. Say start, stop or repeat'; };
+  rec.onresult = e => {
+    for (let i = e.resultIndex; i < e.results.length; i++) handleCommand(e.results[i][0].transcript);
+  };
+  rec.onerror = e => {
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+      infoEl.textContent = 'Mic blocked. Allow the microphone for this site, then reload.';
+      optVoice.checked = false;
+    } else if (e.error !== 'no-speech' && e.error !== 'aborted') infoEl.textContent = 'Mic error: ' + e.error;
+  };
+  rec.onend = () => {
+    if (!running || !optVoice.checked) { rec = null; return; }
+    setTimeout(() => { if (!rec) return; rec.lang = LANG_CODE[L]; try { rec.start(); } catch (e) {} }, 300);
+  };
+  try { rec.start(); } catch (e) { infoEl.textContent = 'Mic could not start: ' + e.message; }
+}
+
+langSel.addEventListener('change', () => setLang(langSel.value));
+optVoice.addEventListener('change', () => { if (optVoice.checked) startVoice(); else if (rec) rec.stop(); });
+optDepth.addEventListener('change', () => { if (optDepth.checked) initDepth(); else depthInfo.textContent = 'Depth AI: off'; });
+
+// ---------- FEATURE 4: vibration patterns ----------
+// far = one gentle tap, near = fast pulses, stop = one long buzz.
+// Each pattern repeats no faster than its "gap", so it never buzzes non-stop.
+const BUZZ = {
+  far:  { pattern: [60],                   gap: 2000, rank: 1 },
+  near: { pattern: [100, 60, 100, 60, 100], gap: 1300, rank: 2 },
+  stop: { pattern: [700],                  gap: 2200, rank: 3 }
+};
+let lastBuzz = 0, lastVibe = 'none';
+
+function buzz(vibe) {
+  if (!navigator.vibrate) return;
+  const cfg = optVibe.checked ? BUZZ[vibe] : null;
+  if (!cfg) { navigator.vibrate(0); lastVibe = 'none'; return; }   // safe: stop vibrating
+  const now = Date.now();
+  const worse = !BUZZ[lastVibe] || cfg.rank > BUZZ[lastVibe].rank; // got more dangerous: buzz now
+  if (!worse && now - lastBuzz < cfg.gap) return;
+  lastBuzz = now;
+  lastVibe = vibe;
+  navigator.vibrate(cfg.pattern);
+}
+
+// ---------- Main loop ----------
+// ---------- Low-light warning ----------
+const lCanvas = document.createElement('canvas');
+lCanvas.width = lCanvas.height = 24;
+const lCtx = lCanvas.getContext('2d', { willReadFrequently: true });
+function avgLuma(d) {                          // d = RGBA pixel array
+  let sum = 0;
+  for (let i = 0; i < d.length; i += 4) sum += 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+  return sum / (d.length / 4);
+}
+function updateDark(avg) {                     // two limits, so it does not flicker
+  const now = dark ? avg < 60 : avg < 40;
+  if (now !== dark) { dark = now; if (dark) speak(t().dark, 'warn', true); }
+}
+function checkLight() {
+  if (demoOn || !video.videoWidth || Date.now() - lastLightCheck < 2000) return;
+  lastLightCheck = Date.now();
+  lCtx.drawImage(video, 0, 0, 24, 24);
+  updateDark(avgLuma(lCtx.getImageData(0, 0, 24, 24).data));
+}
+
+// Shows one set of detections everywhere (camera and demo mode both use this)
+function render(predictions) {
+  drawBoxes(predictions);
+  const result = analyze(predictions);
+  lightZones(result.zones);
+  setRisk(result.vibe);
+  speak(result.message, result.level);
+
+  const now = performance.now();
+  fpsEl.textContent = (1000 / (now - lastFrame)).toFixed(1) + ' det/s';
+  lastFrame = now;
+  statObjects.textContent = predictions.filter(p => p.score >= 0.5).length;
+  statNearest.textContent = result.nearest;
+  statDist.textContent = result.dist != null ? (result.dist < 1 ? '<1 m' : result.dist.toFixed(1) + ' m') : '--';
+  statLevel.textContent = { clear: 'Clear', warn: 'Caution', danger: 'Danger' }[result.level];
+  statBox.className = 'stat ' + result.level;
+  buzz(result.vibe);
+}
+
+async function loop() {
+  if (paused) { setTimeout(loop, 300); return; }
+  checkLight();
+  render(await model.detect(video));
+  setTimeout(loop, 150);                       // short pause, then detect again
+}
+
+// ---------- FEATURE 1: demo mode (no camera needed) ----------
+const dp = (c, x, y, w, h, sc = 0.9) => ({ class: c, score: sc, bbox: [x, y, w, h] });
+const NO_DEPTH = { left: 0, center: 0, right: 0 };
+const DEMO_FRAMES = [];
+function addScene(n, preds, depth, fall) {
+  for (let i = 0; i < n; i++) DEMO_FRAMES.push({ preds: typeof preds === 'function' ? preds(i) : preds, depth: depth || NO_DEPTH, fall: !!fall });
+}
+addScene(4, []);                                                     // path clear
+addScene(8, i => [dp('person', 240 - (40 + i * 20) / 2, 270 - i * 20, 40 + i * 20, 110 + i * 52)]);  // person walks toward you
+addScene(4, [dp('chair', 30, 330, 150, 200)]);                       // chair on the left
+addScene(5, [dp('car', 330, 260, 130, 90)]);                         // car on the right
+addScene(5, [], { left: 0.15, center: 0.88, right: 0.2 });           // wall ahead
+addScene(4, [], NO_DEPTH, true);                                     // stairs or drop-off ahead
+addScene(3, []);
+let demoIdx = 0, DEMO_MS = 800;
+const demoBtn = document.getElementById('demoBtn');
+
+function demoStep() {
+  if (!demoOn) return;
+  const f = DEMO_FRAMES[demoIdx % DEMO_FRAMES.length];
+  if (demoIdx % DEMO_FRAMES.length === 0) tracks = [];
+  demoIdx++;
+  depthZones = f.depth; depthFall = f.fall;
+  if (!paused) render(f.preds);
+  setTimeout(demoStep, DEMO_MS);
+}
+function stopDemo() {
+  demoOn = false; running = false; paused = false;
+  document.getElementById('wrap').classList.remove('live');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  lightZones({ left: '', center: '', right: '' });
+  setRisk('none'); buzz('none'); speechSynthesis.cancel();
+  depthZones = { ...NO_DEPTH }; depthFall = false;
+  demoBtn.textContent = 'Try demo (no camera)';
+  sysEl.className = 'sys'; sysEl.lastElementChild.textContent = 'Standby';
+  startBtn.disabled = false;
+  statusEl.className = ''; statusEl.textContent = 'Press Start walking';
+}
+demoBtn.addEventListener('click', () => {
+  if (demoOn) { stopDemo(); return; }
+  if (running) return;                         // camera is already on
+  demoOn = true; running = true; demoIdx = 0; tracks = [];
+  canvas.width = 480; canvas.height = 640;
+  document.getElementById('wrap').classList.add('live');
+  demoBtn.textContent = 'Stop demo';
+  sysEl.className = 'sys on'; sysEl.lastElementChild.textContent = 'Demo';
+  startBtn.disabled = true;
+  speak(t().demo, 'warn', true);
+  demoStep();
+});
+
+startBtn.addEventListener('click', async () => {
+  if (demoOn) return;
+  startBtn.disabled = true;
+  speak(t().starting, 'warn', true);
+  running = true;
+  startVoice();                                   // inside the tap, so the mic prompt appears now
+  try {
+    await startCamera();
+    model = await cocoSsd.load();
+    startBtn.textContent = 'Running';
+    sysEl.className = 'sys on';
+    sysEl.lastElementChild.textContent = 'Active';
+    speak(t().ready, 'clear', true);
+    initDepth();
+    loop();
+  } catch (err) {
+    statusEl.textContent = 'Error: ' + err.name + ' - ' + err.message;
+    running = false;
+    if (rec) try { rec.stop(); } catch (e2) {}
+    startBtn.disabled = false;
+    startBtn.textContent = 'Start walking';
+  }
+});
+
+// ---------- Page: risk gauge, system status, dock buttons ----------
+const gaugeEl = document.getElementById('gauge'), gaugeNum = document.getElementById('gaugeNum'), gaugeLbl = document.getElementById('gaugeLbl');
+let risk = 8, riskTarget = 8;
+function setRisk(vibe) { riskTarget = { none: 8, far: 35, near: 65, stop: 90 }[vibe] ?? 8; }
+setInterval(() => {
+  if (!running || paused) riskTarget = 8;
+  risk += (riskTarget - risk) * 0.3;
+  const r = Math.round(risk);
+  gaugeEl.style.setProperty('--p', r);
+  gaugeEl.style.setProperty('--c', r < 30 ? 'var(--clear)' : r < 60 ? 'var(--warn)' : 'var(--danger)');
+  gaugeNum.textContent = r + '%';
+  gaugeLbl.textContent = r < 30 ? 'LOW RISK' : r < 60 ? 'MODERATE' : 'HIGH RISK';
+}, 120);
+
+function setStat(id, text, cls) { const el = document.getElementById(id); el.textContent = text; el.className = cls; }
+function tick() {
+  setStat('stCam', running ? 'Active' : 'Off', running ? 'ok' : 'off');
+  const demoRows = demoOn;
+  setStat('stObj', model ? 'Running' : running ? 'Loading' : 'Off', model ? 'ok' : running ? 'warn' : 'off');
+  const dState = !optDepth.checked ? 'Off' : depthEst ? 'Running' : depthLoading ? 'Loading' : running ? (window.makeDepth ? 'Starting' : 'Unavailable') : 'Off';
+  setStat('stDepth', dState, dState === 'Running' ? 'ok' : (dState === 'Loading' || dState === 'Starting') ? 'warn' : 'off');
+  const vState = !optVoice.checked ? 'Off' : !SR ? 'Unsupported' : (rec && running) ? 'Listening' : 'Idle';
+  setStat('stVoice', vState, vState === 'Listening' ? 'ok' : 'off');
+  const bState = !optVibe.checked ? 'Off' : navigator.vibrate ? 'On' : 'Not supported';
+  setStat('stVibe', bState, bState === 'On' ? 'ok' : 'off');
+  setStat('stLight', (!running || demoOn) ? '--' : dark ? 'Too dark' : 'Good', (!running || demoOn) ? 'off' : dark ? 'warn' : 'ok');
+  if (demoRows) ['stCam', 'stObj', 'stDepth'].forEach(id => setStat(id, 'Demo', 'warn'));
+  document.getElementById('dockMic').classList.toggle('on', optVoice.checked);
+}
+tick(); setInterval(tick, 1000);
+
+document.getElementById('dockMic').onclick = () => { optVoice.checked = !optVoice.checked; optVoice.dispatchEvent(new Event('change')); tick(); };
+document.getElementById('dockRepeat').onclick = () => { if (running) speak(lastMessage || t().ready, lastLevel, true); };
+document.getElementById('dockLang').onclick = () => { setLang({ en: 'hi', hi: 'kn', kn: 'en' }[L]); addLog('Language: ' + langSel.options[langSel.selectedIndex].text, 'warn'); };
+
+// ---------- FEATURE 2: SOS (WhatsApp with your location) ----------
+const sosBtn = document.getElementById('dockSos'), sosNum = document.getElementById('sosNum');
+let sosArmed = false, sosTimer = null;
+function disarmSos() { sosArmed = false; clearTimeout(sosTimer); sosBtn.classList.remove('armed'); sosBtn.textContent = 'SOS'; }
+function sendSOS() {
+  const send = pos => {
+    const where = pos ? `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}` : '(location unavailable)';
+    const text = encodeURIComponent('I need help. My location: ' + where);
+    const num = sosNum.value.replace(/[^\d]/g, '');
+    const url = num ? `https://wa.me/${num}?text=${text}` : `https://wa.me/?text=${text}`;
+    window.open(url, '_blank') || (location.href = url);
+  };
+  if (!navigator.geolocation) { send(null); return; }
+  navigator.geolocation.getCurrentPosition(send, () => send(null), { enableHighAccuracy: true, timeout: 8000, maximumAge: 15000 });
+}
+sosBtn.onclick = () => {                         // two taps, so a pocket press cannot send it
+  if (!sosArmed) {
+    sosArmed = true; sosBtn.classList.add('armed'); sosBtn.textContent = 'SEND?';
+    speak(t().sosAsk, 'danger', true);
+    sosTimer = setTimeout(disarmSos, 4000);
+    return;
+  }
+  disarmSos(); speak(t().sosGo, 'danger', true); sendSOS();
+};
+
+// ---------- FEATURE 3: remember settings ----------
+const SAVE_IDS = ['lang', 'optVoice', 'optDepth', 'optVibe', 'depthSens', 'sosNum', 'speechRate', 'speechVol'];
+function saveSettings() {
+  try {
+    const o = {};
+    SAVE_IDS.forEach(id => { const el = document.getElementById(id); o[id] = el.type === 'checkbox' ? el.checked : el.value; });
+    localStorage.setItem('walkAssist.v1', JSON.stringify(o));
+  } catch (e) {}
+}
+function loadSettings() {
+  try {
+    const o = JSON.parse(localStorage.getItem('walkAssist.v1') || '{}');
+    SAVE_IDS.forEach(id => {
+      if (!(id in o)) return;
+      const el = document.getElementById(id);
+      if (el.type === 'checkbox') el.checked = !!o[id]; else el.value = o[id];
+    });
+    if (T[langSel.value]) { L = langSel.value; checkVoice(); } else { langSel.value = L; }
+  } catch (e) {}
+}
+loadSettings();
+['input', 'change'].forEach(ev => document.getElementById('settings').addEventListener(ev, saveSettings));
+
+// ---------- Test log (CSV) ----------
+function buildCSV() {
+  const q = v => '"' + String(v).replace(/"/g, '""') + '"';
+  const rows = [['time', 'mode', 'language', 'level', 'message']].concat(eventLog.map(e => [e.t, e.mode, e.lang, e.level, e.text]));
+  return '\ufeff' + rows.map(r => r.map(q).join(',')).join('\r\n');   // BOM so Excel shows Hindi/Kannada
+}
+document.getElementById('csvBtn').addEventListener('click', () => {
+  if (!eventLog.length) { infoEl.textContent = 'No events yet. Run the demo or a walk first.'; return; }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([buildCSV()], { type: 'text/csv;charset=utf-8' }));
+  a.download = 'walk-assist-log-' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  infoEl.textContent = 'Saved ' + eventLog.length + ' events to a CSV file.';
+});
+
+// ---------- FEATURE 4: install as an app ----------
+let installEvt = null;
+const installBtn = document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; installBtn.hidden = false; });
+installBtn.addEventListener('click', async () => {
+  if (!installEvt) return;
+  installEvt.prompt(); await installEvt.userChoice;
+  installEvt = null; installBtn.hidden = true;
+});
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
